@@ -45,6 +45,32 @@
 
     <div id="color-output"></div>
 
-    <script src="api/index.js"></script>
+    <script>
+      document.getElementById("generate-color").addEventListener("click", async () => {
+        const industry = document.getElementById("industry").value;
+        const voice = document.getElementById("voice").value;
+        const tone = document.getElementById("tone").value;
+
+        const response = await fetch(`/api/color?industry=${industry}&voice=${voice}&tone=${tone}`);
+        const data = await response.json();
+
+        const output = document.getElementById("color-output");
+        output.innerHTML = '';
+
+        if (data.error) {
+          output.textContent = `Error: ${data.error}`;
+        } else {
+          output.innerHTML = `
+            <div class="color-box" style="background-color: ${data.hex};"></div>
+            <strong>${data.name}</strong><br/>
+            Hex: ${data.hex}<br/>
+            RGB: ${data.rgb}<br/>
+            HSL: ${data.hsl}<br/>
+            CMYK: ${data.cmyk}<br/>
+            Description: ${data.description}
+          `;
+        }
+      });
+    </script>
   </body>
 </html>
