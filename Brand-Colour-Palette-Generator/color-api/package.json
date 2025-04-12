@@ -2,9 +2,9 @@
   "name": "color-api",
   "version": "1.0.0",
   "description": "Color Generator API",
-  "main": "api/index.js",
+  "main": "api/color.js",
   "scripts": {
-    "start": "node api/index.js"
+    "start": "node api/color.js"
   },
   "dependencies": {},
   "keywords": ["api", "color"],
