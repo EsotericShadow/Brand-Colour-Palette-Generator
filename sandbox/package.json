@@ -1,13 +1,14 @@
 {
-  "name": "javascript",
+  "name": "color-api",
   "version": "1.0.0",
-  "description": "The JavaScript template",
+  "description": "Color Generator API",
+  "main": "api/index.js",
   "scripts": {
-    "start": "serve src",
-    "build": "echo 'Build not needed for CodeSandbox'"
+    "start": "node api/index.js"
   },
-  "keywords": ["css", "javascript"],
   "dependencies": {
-    "serve": "^14.2.1"
-  }
+    "express": "^4.18.2"
+  },
+  "keywords": ["api", "color"],
+  "license": "ISC"
 }
