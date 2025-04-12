@@ -1,0 +1,13 @@
+{
+  "name": "javascript",
+  "version": "1.0.0",
+  "description": "The JavaScript template",
+  "scripts": {
+    "start": "serve src",
+    "build": "echo 'Build not needed for CodeSandbox'"
+  },
+  "keywords": ["css", "javascript"],
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+}
