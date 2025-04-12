@@ -1,27 +1,28 @@
+const express = require("express");
+const fs = require("fs").promises;
+const path = require("path");
+const app = express();
+
 let colorData = [];
 const colorIndexMap = {};
 
-fetch("color-data.json")
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then((data) => {
-    colorData = data;
+async function loadColorData() {
+  try {
+    const filePath = path.join(__dirname, "../data/color-data.json");
+    const rawData = await fs.readFile(filePath, "utf8");
+    colorData = JSON.parse(rawData);
     console.log("Data loaded:", colorData); // Debug
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error("Fetch error:", error);
-    document.getElementById("color-output").innerHTML =
-      "<p>Error loading color data.</p>";
-  });
+    // No DOM, so log error (client will handle display)
+  }
+}
+
+loadColorData();
 
 function getColor(industry, voice, tone) {
   if (!colorData.length) {
-    displayNoMatch("Color data not loaded yet.");
-    return;
+    return { error: "Color data not loaded yet." };
   }
   const key = `${industry}-${voice}-${tone}`;
   const match = colorData.find(
@@ -35,32 +36,27 @@ function getColor(industry, voice, tone) {
     const currentIndex = colorIndexMap[key] || 0;
     const color = match.colors[currentIndex];
     colorIndexMap[key] = (currentIndex + 1) % match.colors.length;
-    displayColor(color);
+    return color;
   } else {
-    displayNoMatch();
+    return { error: "No matching color found." };
   }
 }
 
-function displayColor(color) {
-  const output = document.getElementById("color-output");
-  output.innerHTML = `
-    <div class="color-box" style="background-color: ${color.hex};"></div>
-    <strong>${color.name}</strong><br>
-    <em>${color.description}</em><br>
-    HEX: ${color.hex}<br>
-    RGB: ${color.rgb}<br>
-    HSL: ${color.hsl}<br>
-    CMYK: ${color.cmyk}
-  `;
-}
+app.get("/api/color", async (req, res) => {
+  const { industry, voice, tone } = req.query;
 
-function displayNoMatch(message = "No matching color found.") {
-  document.getElementById("color-output").innerHTML = `<p>${message}</p>`;
-}
+  if (!industry || !voice || !tone) {
+    return res.status(400).json({ error: "Missing required parameters: industry, voice, tone" });
+  }
 
-document.getElementById("generate-color").addEventListener("click", () => {
-  const industry = document.getElementById("industry").value;
-  const voice = document.getElementById("voice").value;
-  const tone = document.getElementById("tone").value;
-  getColor(industry, voice, tone);
+  const result = getColor(industry, voice, tone);
+
+  if (result.error) {
+    return res.status(404).json({ error: result.error });
+  }
+
+  return res.json(result);
 });
+
+// Vercel handler
+module.exports = app;
