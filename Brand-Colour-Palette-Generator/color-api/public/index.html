@@ -51,7 +51,7 @@
         const voice = document.getElementById("voice").value;
         const tone = document.getElementById("tone").value;
 
-        const response = await fetch(`/api/color?industry=${industry}&voice=${voice}&tone=${tone}`);
+        const response = await fetch(`/api/color.js?industry=${industry}&voice=${voice}&tone=${tone}`);
         const data = await response.json();
 
         const output = document.getElementById("color-output");
