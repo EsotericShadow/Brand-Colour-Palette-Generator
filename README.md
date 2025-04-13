@@ -1,7 +1,7 @@
 
 # Brand Colour Palette Generator API Documentation
 
-This API provides a way to generate a color palette based on an industry, voice, and tone. The API returns one main color that align with the requested criteria, such as Industry, Brand Voice, and Brand Tone
+This API provides a way to generate a color based on an industry, voice, and tone. The API returns one main color that align with the requested criteria, such as Industry, Brand Voice, and Brand Tone
 
 ---
 
@@ -17,7 +17,7 @@ https://brand-colour-palette-generator-o41k.vercel.app/api/color
 
 ### `GET /api/color`
 
-This endpoint returns a color palette based on the specified industry, voice, and tone. If no matching colors are found, it returns an error.
+This endpoint returns a color based on the specified industry, voice, and tone. If no matching colors are found, it returns an error.
 
 ---
 
@@ -204,4 +204,5 @@ Here are some example queries to test the API:
 
 ---
 
-For further questions or issues, feel free to reach out to the API team.
+For further questions or issues, feel free to reach out to the API team at evergreenwebsolutions.ca
+
