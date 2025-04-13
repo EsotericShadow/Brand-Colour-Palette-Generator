@@ -1,7 +1,6 @@
 # Brand-Colour-Palette-Generator
 Generates colours based on industry, brand voice, and brand tone. 
 
-```markdown
 # Brand Colour Palette Generator API Documentation
 
 This API provides a way to generate a color palette based on an industry, voice, and tone. The API returns a set of colors that align with the requested criteria, such as name, hex, RGB, HSL, CMYK, and description.
@@ -208,6 +207,3 @@ Here are some example queries to test the API:
 ---
 
 For further questions or issues, feel free to reach out to the API team.
-```
-
-This documentation provides a structured overview of how to interact with the API, including sample queries, response formats, and available options for industries, voices, and tones.
