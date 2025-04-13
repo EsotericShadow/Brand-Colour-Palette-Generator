@@ -1,28 +1,17 @@
+const fetch = require("node-fetch");
+
 let colorData = [];
 const colorIndexMap = {};
 
-fetch("https://cdn.jsdelivr.net/gh/EsotericShadow/Brand-Colour-Palette-Generator@main/color_data.json")
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then((data) => {
-    colorData = data;
-    console.log("Data loaded:", colorData); // Debug
-  })
-  .catch((error) => {
-    console.error("Fetch error:", error);
-    document.getElementById("color-output").innerHTML =
-      "<p>Error loading color data.</p>";
-  });
+async function loadColorData() {
+  if (colorData.length > 0) return; // Already loaded
+  const url = "https://cdn.jsdelivr.net/gh/EsotericShadow/Brand-Colour-Palette-Generator@main/color_data.json";
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Failed to load color data");
+  colorData = await response.json();
+}
 
 function getColor(industry, voice, tone) {
-  if (!colorData.length) {
-    displayNoMatch("Color data not loaded yet.");
-    return;
-  }
   const key = `${industry}-${voice}-${tone}`;
   const match = colorData.find(
     (entry) =>
@@ -35,32 +24,28 @@ function getColor(industry, voice, tone) {
     const currentIndex = colorIndexMap[key] || 0;
     const color = match.colors[currentIndex];
     colorIndexMap[key] = (currentIndex + 1) % match.colors.length;
-    displayColor(color);
+    return color;
   } else {
-    displayNoMatch();
+    return { error: "No matching color found." };
   }
 }
 
-function displayColor(color) {
-  const output = document.getElementById("color-output");
-  output.innerHTML = `
-    <div class="color-box" style="background-color: ${color.hex};"></div>
-    <strong>${color.name}</strong><br>
-    <em>${color.description}</em><br>
-    HEX: ${color.hex}<br>
-    RGB: ${color.rgb}<br>
-    HSL: ${color.hsl}<br>
-    CMYK: ${color.cmyk}
-  `;
-}
+module.exports = async (req, res) => {
+  const { industry, voice, tone } = req.query;
 
-function displayNoMatch(message = "No matching color found.") {
-  document.getElementById("color-output").innerHTML = `<p>${message}</p>`;
-}
+  if (!industry || !voice || !tone) {
+    return res.status(400).json({ error: "Missing required parameters: industry, voice, tone" });
+  }
 
-document.getElementById("generate-color").addEventListener("click", () => {
-  const industry = document.getElementById("industry").value;
-  const voice = document.getElementById("voice").value;
-  const tone = document.getElementById("tone").value;
-  getColor(industry, voice, tone);
-});
+  try {
+    await loadColorData();
+    const result = getColor(industry, voice, tone);
+    if (result.error) {
+      return res.status(404).json(result);
+    }
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("API Error:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
