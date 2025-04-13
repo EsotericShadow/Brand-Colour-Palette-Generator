@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node api/color.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
   "keywords": ["api", "color"],
   "license": "ISC"
 }
