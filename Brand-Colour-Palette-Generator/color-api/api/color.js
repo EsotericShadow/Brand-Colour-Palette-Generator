@@ -12,12 +12,15 @@ async function loadColorData() {
 }
 
 function getColor(industry, voice, tone) {
-  const key = `${industry}-${voice}-${tone}`;
+  const key = `${industry.toLowerCase()}-${voice.toLowerCase()}-${tone.toLowerCase()}`;
+  
+  console.log(`Looking for match: industry=${industry.toLowerCase()}, voice=${voice.toLowerCase()}, tone=${tone.toLowerCase()}`); // Debugging log
+  
   const match = colorData.find(
     (entry) =>
-      entry.industry === industry &&
-      entry.voice === voice &&
-      entry.tone === tone
+      entry.industry.toLowerCase() === industry.toLowerCase() &&
+      entry.voice.toLowerCase() === voice.toLowerCase() &&
+      entry.tone.toLowerCase() === tone.toLowerCase()
   );
 
   if (match && match.colors.length > 0) {
@@ -39,10 +42,14 @@ module.exports = async (req, res) => {
 
   try {
     await loadColorData();
+    console.log("Loaded color data:", colorData);  // Debugging log
+
     const result = getColor(industry, voice, tone);
     if (result.error) {
+      console.log("No matching color found.");
       return res.status(404).json(result);
     }
+
     return res.status(200).json(result);
   } catch (error) {
     console.error("API Error:", error.message);
