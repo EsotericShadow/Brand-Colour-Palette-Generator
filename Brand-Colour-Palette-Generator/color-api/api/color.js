@@ -5,7 +5,7 @@ const colorIndexMap = {};
 
 async function loadColorData() {
   if (colorData.length > 0) return; // Already loaded
-  const url = "https://cdn.jsdelivr.net/gh/EsotericShadow/Brand-Colour-Palette-Generator@main/Brand-Colour-Palette-Generator/color-api/api/color_data.json";
+  const url = "https://cdn.jsdelivr.net/gh/EsotericShadow/Brand-Colour-Palette-Generator@main/Brand-Colour-Palette-Generator/color-api/api/good_color_data.json";
   const response = await fetch(url);
   if (!response.ok) throw new Error("Failed to load color data");
   colorData = await response.json();
