@@ -5,17 +5,31 @@ const colorIndexMap = {};
 
 async function loadColorData() {
   if (colorData.length > 0) return; // Already loaded
-  const url = "https://cdn.jsdelivr.net/gh/EsotericShadow/Brand-Colour-Palette-Generator@main/Brand-Colour-Palette-Generator/color-api/api/good_color_data.json";
-  const response = await fetch(url);
-  if (!response.ok) throw new Error("Failed to load color data");
-  colorData = await response.json();
+  const url = "https://cdn.jsdelivr.net/gh/EsotericShadow/Brand-Colour-Palette-Generator@main/Brand-Colour-Palette-Generator/color-api/api/color_data.json";
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
+    }
+    const text = await response.text(); // Get raw text for debugging
+    try {
+      colorData = JSON.parse(text);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError.message);
+      console.error("Raw response text:", text.slice(0, 500)); // Log first 500 chars
+      throw new Error("Invalid JSON response from color data URL");
+    }
+  } catch (error) {
+    console.error("Fetch Error:", error.message);
+    throw error;
+  }
 }
 
 function getColor(industry, voice, tone) {
   const key = `${industry.toLowerCase()}-${voice.toLowerCase()}-${tone.toLowerCase()}`;
   
-  console.log(`Looking for match: industry=${industry.toLowerCase()}, voice=${voice.toLowerCase()}, tone=${tone.toLowerCase()}`); // Debugging log
-  
+  console.log(`Looking for match: industry=${industry.toLowerCase()}, voice=${voice.toLowerCase()}, tone=${tone.toLowerCase()}`);
+
   const match = colorData.find(
     (entry) =>
       entry.industry.toLowerCase() === industry.toLowerCase() &&
@@ -34,12 +48,10 @@ function getColor(industry, voice, tone) {
 }
 
 module.exports = async (req, res) => {
-  // ✅ Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Handle preflight
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
@@ -52,17 +64,17 @@ module.exports = async (req, res) => {
 
   try {
     await loadColorData();
-    console.log("Loaded color data:", colorData);  // Debugging log
+    console.log(`Color data loaded, entries: ${colorData.length}`);
 
     const result = getColor(industry, voice, tone);
     if (result.error) {
-      console.log("No matching color found.");
+      console.log("No matching color found for:", { industry, voice, tone });
       return res.status(404).json(result);
     }
 
     return res.status(200).json(result);
   } catch (error) {
     console.error("API Error:", error.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: `Internal Server Error: ${error.message}` });
   }
 };
