@@ -1,33 +1,25 @@
-const fetch = require("node-fetch");
+const fs = require("fs");
+const path = require("path");
 
 let colorData = [];
 const colorIndexMap = {};
 
 async function loadColorData() {
   if (colorData.length > 0) return; // Already loaded
-  const url = "https://cdn.jsdelivr.net/gh/EsotericShadow/Brand-Colour-Palette-Generator@main/Brand-Colour-Palette-Generator/color-api/api/good_color_data.json";
+
+  const filePath = path.join(__dirname, "good_color_data.json");
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
-    }
-    const text = await response.text(); // Get raw text for debugging
-    try {
-      colorData = JSON.parse(text);
-    } catch (parseError) {
-      console.error("JSON Parse Error:", parseError.message);
-      console.error("Raw response text:", text.slice(0, 500)); // Log first 500 chars
-      throw new Error("Invalid JSON response from color data URL");
-    }
+    const fileContents = await fs.promises.readFile(filePath, "utf-8");
+    colorData = JSON.parse(fileContents);
   } catch (error) {
-    console.error("Fetch Error:", error.message);
-    throw error;
+    console.error("Failed to load local color data:", error.message);
+    throw new Error("Failed to load local color data.");
   }
 }
 
 function getColor(industry, voice, tone) {
   const key = `${industry.toLowerCase()}-${voice.toLowerCase()}-${tone.toLowerCase()}`;
-  
+
   console.log(`Looking for match: industry=${industry.toLowerCase()}, voice=${voice.toLowerCase()}, tone=${tone.toLowerCase()}`);
 
   const match = colorData.find(
